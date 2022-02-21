@@ -1,3 +1,13 @@
-// import { Audio } from 'react-loader-spinner';
+import { Rings } from 'react-loader-spinner';
 
-// <Audio height="100" width="100" color="grey" ariaLabel="loading" />;
+import s from './Loader.module.css';
+
+const Loader = () => {
+  return (
+    <div className={s.Loader}>
+      <Rings height="100" width="100" ariaLabel="loading" />
+    </div>
+  );
+};
+
+export default Loader;

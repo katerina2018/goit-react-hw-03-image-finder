@@ -1,38 +1,117 @@
 import React, { Component } from 'react';
-// import { nanoid } from 'nanoid';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
-import Section from './components/Section';
-import TextButton from './components/TextButton';
-import Searchbar from './components/Searchbar';
-import ImageGallery from './components/ImageGallery';
 
-// import IconButton from './components/IconButton';
-// import Modal from './components/Modal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import ImageGallery from './Components/ImageGallery';
+import './App.css';
+import Searchbar from './Components/Searchbar';
+import TextButton from './Components/TextButton';
+import Loader from './Components/Loader';
+import Modal from './Components/Modal';
 
 class App extends Component {
   state = {
-    searchTheme: '',
+    inputValue: '',
+    pictures: [],
+    page: 1,
+    isPending: false,
+    error: null,
+    isModalOpen: false,
+    modalImg: '',
   };
 
-  handleFormSubmit = searchTheme => {
-    this.setState({ searchTheme });
+  componentDidUpdate() {
+    if (this.state.isPending) {
+      fetch(
+        `https://pixabay.com/api/?q=${this.state.inputValue}&page=${this.state.page}&key=24782387-235d5961f89ca8adc0055c0c3&image_type=photo&orientation=horizontal&per_page=12`,
+      )
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          return Promise.reject(new Error('no such pictures found'));
+        })
+        .then(pictures => {
+          if (pictures.totalHits === 0) {
+            toast.error('no pictures found');
+          }
+          this.setState(prevState => ({
+            pictures:
+              this.state.page > 1
+                ? [...prevState.pictures, ...pictures.hits]
+                : pictures.hits,
+            isPending: false,
+          }));
+        })
+        .catch(error => this.setState({ error: error, isPending: false }));
+    }
+  }
+
+  handleSetQuery = event => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  onLoadMorePages() {
+    this.setState(prevState => ({
+      isPending: true,
+      page: prevState.page + 1,
+    }));
+  }
+
+  handleFormSubmit = event => {
+    event.preventDefault();
+
+    this.setState({ isPending: true, page: 1, pictures: [] });
+  };
+
+  handleModalToggle = image => {
+    this.setState(prevState => ({
+      isModalOpen: !prevState.isModalOpen,
+      modalImg: image,
+    }));
   };
 
   render() {
+    const { error, pictures } = this.state;
+
     return (
-      <Section>
-        <h1>Image finder</h1>
+      <div>
+        <ToastContainer position="top-center" autoClose={3000} />
+        {error && <h1>{error.message}</h1>}
+        <Searchbar
+          handleFormSubmit={this.handleFormSubmit}
+          handleSetQuery={this.handleSetQuery}
+          inputValue={this.state.inputValue}
+        />
 
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <ToastContainer autoClose={2000} />
-        <ImageGallery searchTheme={this.state.searchTheme} />
+        {this.state.isPending && this.state.page === 1 ? (
+          <Loader />
+        ) : pictures.length > 0 ? (
+          <ImageGallery
+            pictures={pictures}
+            handleModalToggle={this.handleModalToggle}
+          />
+        ) : null}
 
-        <TextButton>Load more</TextButton>
-
-        {this.state.image && <div>Text</div>}
-      </Section>
+        {!(pictures.length > 0) ? null : !this.state.isPending ? (
+          <TextButton
+            onClick={() => {
+              this.onLoadMorePages(this);
+            }}
+          >
+            Load more
+          </TextButton>
+        ) : (
+          <Loader />
+        )}
+        {this.state.isModalOpen && (
+          <Modal
+            handleModalToggle={this.handleModalToggle}
+            image={this.state.modalImg}
+          />
+        )}
+      </div>
     );
   }
 }

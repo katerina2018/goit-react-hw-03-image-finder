@@ -1,13 +1,27 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+
 import s from './ImageGalleryItem.module.css';
 
-const ImageGalleryItem = () => {
+const ImageGalleryItem = ({
+  pictureUrl,
+  largePicture,
+  tags,
+  handleModalToggle,
+}) => {
   return (
-    <li className={s.ImageGalleryItem}>
-      {/* <img className={s.ImageGalleryItemImage} src="" alt="" /> */}
-      Text111
+    <li
+      onClick={() => handleModalToggle(largePicture)}
+      className={s.ImageGalleryItem}
+    >
+      <img className={s.ImageGalleryImage} src={pictureUrl} alt={tags} />
     </li>
   );
+};
+
+ImageGalleryItem.propTypes = {
+  pictureUrl: PropTypes.string.isRequired,
+  largePicture: PropTypes.string.isRequired,
+  handleModalToggle: PropTypes.func.isRequired,
 };
 
 export default ImageGalleryItem;

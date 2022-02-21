@@ -1,5 +1,4 @@
-import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import s from './TextButton.module.css';
 
 const TextButton = ({ children, onClick, ...allyProps }) => (
@@ -14,8 +13,8 @@ TextButton.defaultProps = {
 };
 
 TextButton.propTypes = {
-  onClick: propTypes.func,
-  children: propTypes.node,
+  onClick: PropTypes.func,
+  children: PropTypes.node,
 };
 
 export default TextButton;

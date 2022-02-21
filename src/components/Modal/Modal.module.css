@@ -4,9 +4,6 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: rgba(0, 0, 0, 0.4);
 }
 .modalContent {
@@ -16,8 +13,10 @@
   transform: translate(-50%, -50%);
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 24px);
-  width: 100%;
+  width: auto;
+  height: auto;
   padding: 10px;
   background-color: #fff;
   border-radius: 3px;
+  overflow: hidden;
 }
